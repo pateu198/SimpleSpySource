@@ -406,10 +406,7 @@ end
 --- @return string
 function SimpleSpy:ValueToVar(value, variablename)
     assert(variablename == nil or typeof(variablename) == "string", "string expected, got " .. typeof(variablename))
-    if not variablename then
-        variablename = 1
-    end
-    return Serializer:serialize({[variablename] = value})
+    return Serializer:serialize(value, variablename)
 end
 
 --- Converts any value to a string, cannot preserve function contents
