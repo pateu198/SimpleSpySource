@@ -390,7 +390,7 @@ local keyToString = false
 function SimpleSpy:ArgsToString(method, args)
     assert(typeof(method) == "string", "string expected, got " .. typeof(method))
     assert(typeof(args) == "table", "table expected, got " .. typeof(args))
-    return v2v({args = args}) .. "\n\n" .. method .. "(unpack(args))"
+    return Serializer:serialize({args = args}) .. "\n\n" .. method .. "(unpack(args))"
 end
 
 --- Converts a value to variables with the specified index as the variable name (if nil/invalid then the name will be assigned automatically)
@@ -398,7 +398,7 @@ end
 --- @return string
 function SimpleSpy:TableToVars(t)
     assert(typeof(t) == "table", "table expected, got " .. typeof(t))
-    return v2v(t)
+    return Serializer:serialize(t)
 end
 
 --- Converts a value to a variable with the specified `variablename` (if nil/invalid then the name will be assigned automatically)
@@ -409,14 +409,14 @@ function SimpleSpy:ValueToVar(value, variablename)
     if not variablename then
         variablename = 1
     end
-    return v2v({[variablename] = value})
+    return Serializer:serialize({[variablename] = value})
 end
 
 --- Converts any value to a string, cannot preserve function contents
 --- @param value any
 --- @return string
 function SimpleSpy:ValueToString(value)
-    return v2s(value)
+    return Serializer:serialize(value)
 end
 
 --- Generates the simplespy function info
@@ -424,7 +424,7 @@ end
 --- @return string
 function SimpleSpy:GetFunctionInfo(func)
     assert(typeof(func) == "function", "Instance expected, got " .. typeof(func))
-    return v2v{functionInfo = {
+    return Serializer:serialize{functionInfo = {
         info = debug.getinfo(func),
         constants = debug.getconstants(func)
     }}
@@ -1120,7 +1120,7 @@ function genScript(remote, args)
     -- local gen = ""
     -- if #args > 0 then
     --     if not pcall(function()
-    --             gen = v2v({args = args}) .. "\n"
+    --             gen = Serializer:serialize({args = args}) .. "\n"
     --         end)
     --     then
     --         gen = gen .. "-- TableToString failure! Reverting to legacy functionality (results may vary)\nlocal args = {"
@@ -1211,7 +1211,7 @@ end
 
 -- --- value-to-variable
 -- --- @param t any
--- function v2v(t)
+-- function Serializer:serialize(t)
 --     topstr = ""
 --     bottomstr = ""
 --     getnilrequired = false
@@ -1761,7 +1761,7 @@ function remoteHandler(hookfunction, methodName, remote, args, func, calling)
             local functionInfo = {}
             pcall(function() functionInfo.info = debug.getinfo(func) end)
             pcall(function() functionInfo.constants = debug.getconstants(func) end)
-            pcall(function() functionInfoStr = v2v{functionInfo = functionInfo} end)
+            pcall(function() functionInfoStr = Serializer:serialize{functionInfo = functionInfo} end)
             pcall(function() if type(calling) == "userdata" then src = calling end end)
         end
         if methodName:lower() == "fireserver" then
@@ -1977,7 +1977,7 @@ newButton(
     function() return "Click to copy the path of the remote" end,
     function()
         if selected then
-            setclipboard(v2s(selected.Remote))
+            setclipboard(Serializer:serialize(selected.Remote, "remote"))
             TextLabel.Text = "Copied!"
         end
     end
