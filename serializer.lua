@@ -99,7 +99,7 @@ end
 
 -- Userdata Subclasses
 
-types.Vector3(value) = types.vector -- Vector3 being replaced
+types.Vector3 = types.vector -- Vector3 being replaced
 
 return {
     config = function(_, k, v)
