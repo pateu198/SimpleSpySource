@@ -55,7 +55,7 @@ end
 
 ---- TYPE HANDLING ----
 
--- Primitives (yes ik strings technically aren't but they're immutable in lua so deal with it)
+-- Primitive/Immutable
 
 function types.string(value)
     local i = 1
@@ -91,9 +91,15 @@ function types.number(value)
     end
 end
 
+function types.vector(value)
+    return string.format("Vector3.new(%s, %s, %s)", types.number(value.X), types.number(value.Y), types.number(value.Z))
+end
+
 -- Non-Primitives
 
 -- Userdata Subclasses
+
+types.Vector3(value) = types.vector -- Vector3 being replaced
 
 return {
     config = function(_, k, v)
