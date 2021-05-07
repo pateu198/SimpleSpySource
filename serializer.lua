@@ -72,6 +72,8 @@ function types.string(value)
             buildStr = buildStr .. "\\t"
         elseif string.byte(char) > 126 or string.byte(char) < 32 then
             buildStr = buildStr .. string.format("\\%d", string.byte(char))
+        else
+            buildStr = buildStr .. char
         end
         i = i + 1
         char = string.sub(value, i, i)
