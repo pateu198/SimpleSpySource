@@ -38,7 +38,7 @@ end
 --- @param name string
 function valueToVar(value, name)
     assertTypeOf(name, "string")
-    local metadata = { bottomStr = "\n" }
+    local metadata = { bottomStr = "" }
     if string.match(name, variablePattern) then
         return string.format("local %s = %s", name, typeToString(value) .. metadata.bottomStr)
     else
