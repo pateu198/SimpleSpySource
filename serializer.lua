@@ -49,8 +49,8 @@ end
 --- Wrapper for `types`
 function typeToString(value, metadata)
     metadata = metadata or {}
-    local out = types[getTypeOf(value)](value, metadata)
-    return out or string.format("nil --[[UnhandledType: %s, UserdataSubclass: %s]]", getTypeOf(value))
+    local out = types[getTypeOf(value)]
+    return out and out(value, metadata) or string.format("nil --[[UnhandledType: %s, UserdataSubclass: %s]]", getTypeOf(value))
 end
 
 ---- TYPE HANDLING ----
