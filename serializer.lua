@@ -61,25 +61,25 @@ end
 function types.string(value, metadata)
     local i = 1
     local char = string.sub(value, i, i)
-    local buildStr = ""
+    local buildStr = {}
     while char ~= "" do
         if char == '"' then
-            buildStr = buildStr .. '\\"'
+            buildStr[i] = '\\"'
         elseif char == "\\" then
-            buildStr = buildStr .. "\\\\"
+            buildStr[i] = "\\"
         elseif char == "\n" then
-            buildStr = buildStr .. "\\n"
+            buildStr[i] = "\n"
         elseif char == "\t" then
-            buildStr = buildStr .. "\\t"
+            buildStr[i] = "\t"
         elseif string.byte(char) > 126 or string.byte(char) < 32 then
-            buildStr = buildStr .. string.format("\\%d", string.byte(char))
+            buildStr[i] = string.format("\\%d", string.byte(char))
         else
-            buildStr = buildStr .. char
+            buildStr[i] = char
         end
         i = i + 1
         char = string.sub(value, i, i)
     end
-    return metadata.stringNoQuotes and buildStr or string.format('"%s"', buildStr)
+    return metadata.stringNoQuotes and table.concat(buildStr) or string.format('"%s"', table.concat(buildStr))
 end
 
 function types.boolean(value)
