@@ -108,6 +108,7 @@ Text.Text = "TEXT"
 Text.TextColor3 = Color3.new(1, 1, 1)
 Text.TextSize = 14
 Text.TextXAlignment = Enum.TextXAlignment.Left
+Text.TextTruncate = Enum.TextTruncate.AtEnd
 
 Button.Name = "Button"
 Button.Parent = RemoteTemplate
@@ -1068,7 +1069,7 @@ end
 --- @param blocked any
 function newRemote(type, name, args, remote, function_info, blocked, src)
     local remoteFrame = RemoteTemplate:Clone()
-    remoteFrame.Text.Text = handlespecials(name:sub(1, 11))
+    remoteFrame.Text.Text = Serializer:formatStr(name:sub(1, 25))
     remoteFrame.ColorBar.BackgroundColor3 = type == "event" and Color3.new(255, 242, 0) or Color3.fromRGB(99, 86, 245)
     local id = Instance.new("IntValue")
     id.Name = "ID"
