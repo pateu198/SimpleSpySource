@@ -1089,6 +1089,7 @@ function newRemote(type, name, args, remote, function_info, blocked, src)
         if blocked then
             logs[#logs].GenScript = "-- THIS REMOTE WAS PREVENTED FROM FIRING THE SERVER BY SIMPLESPY\n\n" .. logs[#logs].GenScript
         end
+        print(log.GenScript)
     end)
     local connect = remoteFrame.Button.MouseButton1Click:Connect(function()
         eventSelect(remoteFrame)
@@ -1112,7 +1113,7 @@ function genScript(remote, args)
         genScript = genScript .. Serializer:serialize(args, "args") .. "\n\n"
         hasArgs = true
     end
-    return genScript .. string.format("%s\nremote:%s(%s)", Serializer:serialize(remote, "remote"), remote.IsA("RemoteEvent") and "FireServer" or "InvokeServer", hasArgs and "args" or "")
+    return genScript .. string.format("%s\nremote:%s(%s)", Serializer:serialize(remote, "remote"), remote:IsA("RemoteEvent") and "FireServer" or "InvokeServer", hasArgs and "args" or "")
     -- prevTables = {}
     -- local gen = ""
     -- if #args > 0 then
