@@ -58,7 +58,7 @@ end
 
 -- Primitive/Immutable
 
-function types.string(value)
+function types.string(value, metadata)
     local i = 1
     local char = string.sub(value, i, i)
     local buildStr = ""
@@ -79,7 +79,7 @@ function types.string(value)
         i = i + 1
         char = string.sub(value, i, i)
     end
-    return string.format('"%s"', buildStr)
+    return metadata.stringNoQuotes and buildStr or string.format('"%s"', buildStr)
 end
 
 function types.boolean(value)
@@ -112,5 +112,13 @@ return {
     ---@param varName string
     serialize = function(_, v, varName)
         return valueToVar(v, varName)
+    end,
+    ---@param s string
+    formatStr = function(_, s)
+        return types.string(s, { stringNoQuotes = true })
+    end,
+    ---@param instance Instance
+    instancePath = function(_, instance)
+        return types.Instance(instance)
     end
 }
