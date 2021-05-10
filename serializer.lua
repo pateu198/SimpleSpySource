@@ -43,9 +43,9 @@ function valueToVar(value, name)
     local metadata = { top = {}, bottom = {} }
     local serialized = typeToString(value, metadata)
     if name and string.match(name, variablePattern) then
-        return string.format("%slocal %s = %s\n%s", table.concat(metadata.top, "\n"), name, serialized, table.concat(metadata.bottom, "\n"))
+        return string.format("%s\nlocal %s = %s\n%s", table.concat(metadata.top, "\n"), name, serialized, table.concat(metadata.bottom, "\n"))
     else
-        return string.format("%slocal var = %s\n%s", table.concat(metadata.top, "\n"), serialized, table.concat(metadata.bottom, "\n"))
+        return string.format("%s\nlocal var = %s\n%s", table.concat(metadata.top, "\n"), serialized, table.concat(metadata.bottom, "\n"))
     end
 end
 
