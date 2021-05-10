@@ -127,7 +127,7 @@ types["function"] = function(value)
 end
 
 function types.userdata(value)
-    return string.format("newproxy(%s) --[[Type: Userdata, MetatableLocked: %s]]", types.boolean(getmetatable(value) and true or false), types.boolean(type(value) == "string" and true or false))
+    return string.format("newproxy(%s) --[[Type: Userdata, MetatableLocked: %s]]", types.boolean(getmetatable(value) ~= nil and true or false), types.boolean(getmetatable(value) ~= nil and type(getmetatable(value)) ~= "table" and true or false))
 end
 
 -- Userdata Subclasses
