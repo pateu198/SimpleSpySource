@@ -41,7 +41,7 @@ end
 function valueToVar(value, name)
     assertTypeOf(name, "string", "nil")
     local metadata = { top = {}, bottom = {} }
-    local serialized = typeToString(value)
+    local serialized = typeToString(value, metadata)
     if string.match(name, variablePattern) then
         return string.format("%slocal %s = %s\n%s", table.concat(metadata.top, "\n"), name, serialized, table.concat(metadata.bottom, "\n"))
     else
@@ -138,9 +138,9 @@ function types.Instance(value, metadata)
     local pathBuilder = {}
     while value do
         if value.Parent == nil then
-            metadata.InstanceUseNilspace = true
             table.insert(pathBuilder, string.format("getnil(%s, %s)", types.string(value.Name), types.string(value.ClassName)))
             if metadata and metadata.top then
+                metadata.InstanceUseNilspace = true
                 table.insert(table.insert(metadata.top, getNilString))
             end
             break
