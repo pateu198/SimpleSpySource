@@ -51,7 +51,6 @@ end
 
 --- Wrapper for `types`
 function typeToString(value, metadata)
-    metadata = metadata or {}
     local type, userdataSubclass = getTypeOf(value)
     local out = types[type]
     return out and out(value, metadata) or string.format("nil --[[UnhandledType: %s, UserdataSubclass: %s]]", type, types.boolean(userdataSubclass))
@@ -72,7 +71,6 @@ end
 -- Primitive/Immutable
 
 function types.string(value, metadata)
-    metadata = metadata or {}
     local i = 1
     local char = string.sub(value, i, i)
     local buildStr = {}
@@ -93,7 +91,7 @@ function types.string(value, metadata)
         i = i + 1
         char = string.sub(value, i, i)
     end
-    return metadata.stringNoQuotes and table.concat(buildStr) or string.format('"%s"', table.concat(buildStr))
+    return metadata and metadata.stringNoQuotes and table.concat(buildStr) or string.format('"%s"', table.concat(buildStr))
 end
 
 function types.boolean(value)
@@ -142,7 +140,9 @@ function types.Instance(value, metadata)
         if value.Parent == nil then
             metadata.InstanceUseNilspace = true
             table.insert(pathBuilder, string.format("getnil(%s, %s)", types.string(value.Name), types.string(value.ClassName)))
-            table.insert(table.insert(metadata.top, getNilString))
+            if metadata and metadata.top then
+                table.insert(table.insert(metadata.top, getNilString))
+            end
             break
         elseif value.Parent == game then
             if game:GetService(value.ClassName) then
