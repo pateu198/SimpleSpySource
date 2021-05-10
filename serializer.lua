@@ -142,7 +142,7 @@ function types.Instance(value, metadata)
         if value.Parent == nil then
             metadata.InstanceUseNilspace = true
             table.insert(pathBuilder, string.format("getnil(%s, %s)", types.string(value.Name), types.string(value.ClassName)))
-            table.insert(metadata.top(getNilString))
+            table.insert(table.insert(metadata.top, getNilString))
             break
         elseif value.Parent == game then
             if game:GetService(value.ClassName) then
