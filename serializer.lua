@@ -72,6 +72,7 @@ end
 -- Primitive/Immutable
 
 function types.string(value, metadata)
+    metadata = metadata or {}
     local i = 1
     local char = string.sub(value, i, i)
     local buildStr = {}
