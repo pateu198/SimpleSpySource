@@ -54,7 +54,7 @@ function typeToString(value, metadata)
     return out and out(value, metadata) or string.format("nil --[[UnhandledType: %s, UserdataSubclass: %s]]", type, types.boolean(userdataSubclass))
 end
 
----- TYPE HANDLING ----
+-- TYPE HANDLING --
 
 -- Primitive/Immutable
 
@@ -66,7 +66,7 @@ function types.string(value, metadata)
         if char == '"' then
             buildStr[i] = '\\"'
         elseif char == "\\" then
-            buildStr[i] = "\\"
+            buildStr[i] = "\\\\"
         elseif char == "\n" then
             buildStr[i] = "\\n"
         elseif char == "\t" then
