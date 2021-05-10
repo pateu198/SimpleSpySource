@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local settings = {
     indentSpaces = 4,
     maxTableSize = 1000,
@@ -8,6 +9,7 @@ local settings = {
     useSafeToString = true,
 }
 local variablePattern = "^[%a_]+[%w_]*$"
+local getNilString = "function getnil(name, class) for _, v in pairs(getnilinstances()) do if v.Name == name and v.ClassName == class then return v end end end"
 local types = {}
 
 --- Gets the type of `x`, returns tuple with true as second index if userdata subclass
@@ -38,11 +40,12 @@ end
 --- @param name string
 function valueToVar(value, name)
     assertTypeOf(name, "string", "nil")
-    local metadata = { bottomStr = "" }
+    local metadata = { topStr = "", bottom = {} }
+    local serialized = typeToString(value)
     if string.match(name, variablePattern) then
-        return string.format("local %s = %s", name, typeToString(value) .. metadata.bottomStr)
+        return string.format("%slocal %s = %s\n%s", table.concat(metadata.top, "\n"), name, serialized, table.concat(metadata.bottom, "\n"))
     else
-        return string.format("local var = %s", typeToString(value))
+        return string.format("%slocal var = %s\n%s", table.concat(metadata.top, "\n"), serialized, table.concat(metadata.bottom, "\n"))
     end
 end
 
@@ -52,6 +55,16 @@ function typeToString(value, metadata)
     local type, userdataSubclass = getTypeOf(value)
     local out = types[type]
     return out and out(value, metadata) or string.format("nil --[[UnhandledType: %s, UserdataSubclass: %s]]", type, types.boolean(userdataSubclass))
+end
+
+--- Multi-purpose function for parsing lua indices (object.index/object["index"])
+function parseIndex(index)
+    assertTypeOf(index, "string")
+    if string.match(index, variablePattern) then
+        return string.format(".%s", index)
+    else
+        return string.format("[%s]", types.string(index))
+    end
 end
 
 -- TYPE HANDLING --
@@ -121,6 +134,44 @@ end
 -- Userdata Subclasses
 
 types.Vector3 = types.vector -- Vector3 being replaced
+
+function types.Instance(value, metadata)
+    local pathBuilder = {}
+    while value do
+        if value.Parent == nil then
+            metadata.InstanceUseNilspace = true
+            table.insert(pathBuilder, string.format("getnil(%s, %s)", types.string(value.Name), types.string(value.ClassName)))
+            table.insert(metadata.top(getNilString))
+            break
+        elseif value.Parent == game then
+            if game:GetService(value.ClassName) then
+                table.insert(pathBuilder, string.format('game:GetService("%s")', value.ClassName))
+            else
+                table.insert(pathBuilder, parseIndex(value.Name))
+                table.insert(pathBuilder, string.format("game"))
+            end
+            break
+        elseif value.Parent:IsA("Player") then
+            table.insert(pathBuilder, parseIndex(value.Name))
+            table.insert(pathBuilder, 'game:GetService("Players").LocalPlayer')
+            break
+        elseif value.Parent:IsA("Model") then
+            local player = Players:GetPlayerFromCharacter(value.Parent)
+            if player then
+                table.insert(pathBuilder, parseIndex(value.Name))
+                table.insert(pathBuilder, string.format('game:GetService("Players")%s.Character', player == Players.LocalPlayer and ".LocalPlayer" or parseIndex(player.Name)))
+                break
+            end
+        end
+        table.insert(pathBuilder, parseIndex(value.Name))
+        value = value.Parent
+    end
+    local out = ""
+    for i = #pathBuilder, 1, -1 do
+        out = out .. pathBuilder[i]
+    end
+    return out
+end
 
 return {
     config = function(_, k, v)
