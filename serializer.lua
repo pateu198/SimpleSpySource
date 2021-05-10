@@ -68,9 +68,9 @@ function types.string(value, metadata)
         elseif char == "\\" then
             buildStr[i] = "\\"
         elseif char == "\n" then
-            buildStr[i] = "\n"
+            buildStr[i] = "\\n"
         elseif char == "\t" then
-            buildStr[i] = "\t"
+            buildStr[i] = "\\t"
         elseif string.byte(char) > 126 or string.byte(char) < 32 then
             buildStr[i] = string.format("\\%d", string.byte(char))
         else
@@ -89,6 +89,8 @@ end
 function types.number(value)
     if value ~= value then
         return "0/0 --[[NaN]]"
+    elseif value == math.huge then
+        return "math.huge"
     else
         return string.format("%g", value)
     end
