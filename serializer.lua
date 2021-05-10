@@ -145,7 +145,9 @@ function types.Instance(value, metadata)
             end
             break
         elseif value.Parent == game then
-            if game:GetService(value.ClassName) then
+            if value == workspace then
+                table.insert(pathBuilder, "workspace")
+            elseif game:GetService(value.ClassName) then
                 table.insert(pathBuilder, string.format('game:GetService("%s")', value.ClassName))
             else
                 table.insert(pathBuilder, parseIndex(value.Name))
