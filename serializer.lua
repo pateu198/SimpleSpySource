@@ -37,12 +37,12 @@ end
 --- @param value any
 --- @param name string
 function valueToVar(value, name)
-    assertTypeOf(name, "string")
+    assertTypeOf(name, "string", "nil")
     local metadata = { bottomStr = "" }
     if string.match(name, variablePattern) then
         return string.format("local %s = %s", name, typeToString(value) .. metadata.bottomStr)
     else
-        return string.format("local t = %s", typeToString(value))
+        return string.format("local var = %s", typeToString(value))
     end
 end
 
@@ -100,7 +100,23 @@ function types.vector(value)
     return string.format("Vector3.new(%s, %s, %s)", types.number(value.X), types.number(value.Y), types.number(value.Z))
 end
 
+types["nil"] = function()
+    return "nil"
+end
+
 -- Non-Primitives
+
+function types.thread(value)
+    return string.format("nil --[[Type: Thread, Status: %s]]", types.string(coroutine.status(value)))
+end
+
+types["function"] = function(value)
+    return string.format("nil --[[Type: Function, Address: %s]]", string.sub(tostring(value), 10, -1))
+end
+
+function types.userdata(value)
+    return string.format("newproxy(%s) --[[Type: Userdata, MetatableLocked: %s]]", types.boolean(getmetatable(value) and true or false), types.boolean(type(value) == "string" and true or false))
+end
 
 -- Userdata Subclasses
 
@@ -115,12 +131,5 @@ return {
     serialize = function(_, v, varName)
         return valueToVar(v, varName)
     end,
-    ---@param s string
-    formatStr = function(_, s)
-        return types.string(s, { stringNoQuotes = true })
-    end,
-    ---@param instance Instance
-    instancePath = function(_, instance)
-        return types.Instance(instance)
-    end
+    types = types
 }
