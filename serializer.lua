@@ -93,7 +93,9 @@ function types.string(value, metadata)
         char = string.sub(value, i, i)
         if i % 200 == 0 then
             -- TODO: add indentation and indent to metadata
-            indentStr = indentStr or string.rep(" ", metadata.indentation + metadata.indent)
+            metadata.indentation_level = metadata.indentation_level or 0
+            metadata.indent = metadata.indent or 0
+            indentStr = indentStr or string.rep(" ", metadata.indentation_level + metadata.indent)
             table.move({'"\n', indentStr, '... "'}, 1, 3, i, buildStr)
             i += 3
         end
