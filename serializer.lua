@@ -71,9 +71,10 @@ end
 -- Primitive/Immutable
 
 function types.string(value, metadata)
+    local buildStr = {}
     local i = 1
     local char = string.sub(value, i, i)
-    local buildStr = {}
+    local indentStr
     while char ~= "" do
         if char == '"' then
             buildStr[i] = '\\"'
@@ -90,6 +91,12 @@ function types.string(value, metadata)
         end
         i = i + 1
         char = string.sub(value, i, i)
+        if i % 200 == 0 then
+            -- TODO: add indentation and indent to metadata
+            indentStr = indentStr or string.rep(" ", metadata.indentation + metadata.indent)
+            table.move({'"\n', indentStr, '... "'}, 1, 3, i, buildStr)
+            i += 3
+        end
     end
     return metadata and metadata.stringNoQuotes and table.concat(buildStr) or string.format('"%s"', table.concat(buildStr))
 end
